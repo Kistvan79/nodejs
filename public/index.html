@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <form action="skript" method="post">
-        <label>År:</label>
-        <input type="text" name="msg_year"><br>
-        <label>Månad:</label>
-        <input type="text" name="msg_month"><br>
-        <input type="submit">
-</form>
-
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- inkluderar socket.io i sidan -->
+    <script src="/socket.io/socket.io.js"></script>
+    <title>Socket.io</title>
+  </head>
+  <body>
+    <input id="msg" type="text" />
+    <button onclick="scream();">Scream</button>
+  </body>
+  <script>
+    const socket = io() // Skapar en socket med en koppling till servern.
+    scream = function () {
+      var msg = document.getElementById("msg").value
+      socket.emit("scream", msg) // Emittar "skickar" något till servern.
+      alert("Scream!")
+    }
+  </script>
 </html>

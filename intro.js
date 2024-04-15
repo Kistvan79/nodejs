@@ -1,43 +1,33 @@
+
 import express from "express";
-import fs from "fs";
-import url from "url"
+import {createServer} from "http";
+import { Server } from "socket.io";
+import path from "path";
 
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import { myDateTime } from "./myFirstModule.js";
+const app = express()
+const httpServer = createServer(app)
+const socketIO = new Server(httpServer)
 
-const PORT = 3000
-const WEBISTE_FOLER = 'public'
-const server = express()
+app.use(express.static("public"))
+app.use(express.urlencoded({extended: true}))
 
-server.use(express.static(WEBISTE_FOLER));
-server.use(express.urlencoded());
+app.get("/", function (req, res) {
+  res.sendFile(__dirname + "/public")
+})
 
 
-server.post("/skript", (req, res) => {
-  console.log(res);
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.end(`Du skrev : ${req.body.msg_year} and ${req.body.msg_month}  `);
-});
+// on "connection" sker när en klient kopplar sig till servern
+socketIO.on("connection", function (socket) {
+  console.log("A user connected")
 
-server.get('/counter', (req, res) => {
 
-  fs.readFile('public/counter.txt', function(err, data) {
-    let dataFromFile = data.toString()
-    let nbr = Number(dataFromFile);
-    nbr++
-    fs.writeFile('public/counter.txt', nbr.toString(), function (err) {
-      if (err) throw err;
-    });
-
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.end(`Denna sida har laddats ${nbr} gånger`);
+  // Säger till servern att lyssna efter "scream" emit från klienten
+  socket.on("scream", function (data) {
+    console.log("I heard a scream: " + data)
   })
-
-});
-
+})
 
 
-server.listen(PORT, () => {
-  console.log(`Server Listening to port ${PORT}`)
-});
+httpServer.listen(3000, function () {
+  console.log("listening on *:3000")
+})
